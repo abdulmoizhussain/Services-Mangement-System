@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="horizontal"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	>
+
+	<ImageView
+		android:layout_height="70dp"
+		android:layout_width="70dp"
+		android:id="@+id/image_item"
+		android:src="@drawable/carpenter"
+		/>
+
+	<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="Sample Text"
+		android:layout_weight="1"
+		android:layout_gravity="center"
+		android:id="@+id/text_item"
+		/>
+
+	<TextView
+		android:id="@+id/textViewID"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_weight="1"
+		android:visibility="gone"
+		android:text="" />
+
+	<TextView
+		android:id="@+id/category"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_weight="1"
+		android:visibility="gone"
+		android:text="" />
+</LinearLayout>

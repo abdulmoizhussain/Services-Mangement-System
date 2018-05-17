@@ -1,6 +1,7 @@
 package com.example.abdul.servicesmanagementsystem;
 
 import android.content.Context;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.RequestQueue;
@@ -8,8 +9,14 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,73 +26,72 @@ import java.util.Map;
 
 public class RequestClass {
 
-	private Map<String,String> params;
+	private Map<String,String> mParams;
 	private String responseString;
-	private String URL;
-	private int METHOD;
-	private Context context;
+	private String mURL;
+	private int mMETHOD;
+	private Context mContext;
+	private Map<String, String> mHeaders;
+	private IResult mResultCallback = null;
 
-	RequestClass (Context context, String url, int method) {
-		this.context = context;
-		this.URL = url;
-		this.METHOD = method;
-		this.params = new HashMap<>();
+	RequestClass (IResult resultCallback, Context context, String url, int method) {
+		mResultCallback = resultCallback;
+		mContext = context;
+		mURL = url;
+		mMETHOD = method;
+		mParams = new HashMap<>();
+		mHeaders = new HashMap<>();
 	}
 
 	public void executeRequest() {
-		StringRequest request = new StringRequest(this.METHOD,
-				this.URL,
+		Toast.makeText(mContext, ":::"+mURL, Toast.LENGTH_SHORT).show();
+		StringRequest request = new StringRequest (this.mMETHOD,
+				mURL,
 				new Response.Listener<String>() {
 					@Override
 					public void onResponse(String responseStr) {
 						responseString = responseStr;
+
+						if(mResultCallback != null)
+							mResultCallback.notifySuccess(responseStr);
 					}
 				},new Response.ErrorListener() {
 			@Override
 			public void onErrorResponse(VolleyError volleyError) {
 				volleyError.printStackTrace();
-//				volleyError.
-//				pass.append( volleyError.toString() );
+
+				if(mResultCallback != null)
+					mResultCallback.notifyError(volleyError);
 			}
 		})
 		{
 			@Override
 			protected Map<String, String> getParams() throws AuthFailureError {
-//				if (params.length != 0) {
-//					for (int i=0; i<params.length; i++) {
-//						// getting params and their values from paramValues...
-//						// an putting them into hash Map.
-//						parameters.put(params[i], paramValues[i] );
-//				    }
-//				}
-				return params;
+				return mParams;
 			}
 
 			@Override
 			public Map<String, String> getHeaders() throws AuthFailureError {
-				Map<String, String> headers = new HashMap<>();
 //				String authToken = "Bearer " + ;
-//				headers.put("Content-Type", "application/json");
-				headers.put("Content-Type", "application/x-www-form-urlencoded");
 //				headers.put("Authorization", authToken);
-				return headers;
+				mHeaders.put("Content-Type", "application/json");
+				mHeaders.put("Content-Type", "application/x-www-form-urlencoded");
+				return mHeaders;
 			}
 		};
-		RequestQueue rQueue = Volley.newRequestQueue(this.context);
+		RequestQueue rQueue = Volley.newRequestQueue(this.mContext);
 		rQueue.add(request);
 	}
 
-	public void putSendingParam(String param, String paramValue) {
-		this.params.put(param, paramValue);
+	public void setParamAndValue(String param, String value) {
+		this.mParams.put(param, value);
+	}
+
+	public void setHeaderAndValue(String param, String value) {
+		this.mHeaders.put(param, value);
 	}
 
 	public String getResponseString() {
 		return this.responseString;
-	}
-
-	public void setAuthorization (String token) {
-//		"Authorization "
-//		"Bearer "+token;
-//		status = private;
 	}
 }
