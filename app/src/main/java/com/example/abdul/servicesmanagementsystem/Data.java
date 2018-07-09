@@ -10,9 +10,6 @@ public class Data {
 	private String name;
 	private String category;
 
-//	public Data() {
-//	}
-
 	public Data(String imageData, String name_) {
 		this.imageUrl = imageData;
 		this.name = name_;

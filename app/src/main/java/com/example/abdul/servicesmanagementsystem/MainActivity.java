@@ -1,74 +1,91 @@
 package com.example.abdul.servicesmanagementsystem;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
+import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
-//import android.util.Base64;
-import org.apache.commons.codec.binary.Base64;
-
+import android.preference.PreferenceManager;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.VolleyError;
-import com.google.gson.Gson;
-import com.squareup.picasso.Picasso;
 
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URLEncoder;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.logging.Logger;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import javax.crypto.Mac;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-
-import oauth.signpost.OAuthConsumer;
-import oauth.signpost.basic.DefaultOAuthConsumer;
-import oauth.signpost.exception.OAuthCommunicationException;
-import oauth.signpost.exception.OAuthExpectationFailedException;
-import oauth.signpost.exception.OAuthMessageSignerException;
-import oauth.signpost.signature.HmacSha1MessageSigner;
-
-public class MainActivity extends AppCompatActivity {
-
-	//String url = "http://192.168.1.110/wp-json/wp/v2/posts?filter[posts_per_page]=10&fields=id,title";
-
-
-	private final String HMAC_SHA1 = "HmacSHA1";
-	private final String CONSUMER_KEY = "ck_ff6976252c41d4fb2a080853f5fe1ce04763fdf2";
-	private final String CONSUMER_SECRET = "cs_4a20f83cd0aba4082864cb12d668683fafcef97c";
-	private final String UTF8 = "UTF-8";
-
-	Base64 base64 = new Base64();
-
+public class MainActivity extends BaseActivity {
+	Integer basicTokenCounter;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
+		oneTimeCode();
+		
+		basicTokenCounter = 0;
+		getAndSaveBasicTOKEN(); // to check internet connectivity and set basic working token.
 	}
 
-	public void onLoginButton (View v) {
-		startActivity(new Intent(this, login.class));
+	
+	private void getAndSaveBasicTOKEN() {
+		CustomRequest customRequest = new CustomRequest(new IResult() {
+			@Override
+			public void notifySuccess(String response) {
+				
+				try {
+					String value;
+					JSONObject object = new JSONObject(response);
+					value = object.getString("token");
+					All.setSharedSTR(All.BASIC_TOKEN, value, MainActivity.this);
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+			
+			@Override
+			public void notifyError(VolleyError error) {
+				All.handleVolleyError(MainActivity.this, error);
+				Toast.makeText(MainActivity.this, "Check Internet Connection", Toast.LENGTH_SHORT).show();
+				if (basicTokenCounter < 3) {
+					getAndSaveBasicTOKEN();
+				}
+			}
+		},
+				MainActivity.this,
+				"http://" + All.LOCALHOST+"/fixmyhome/wp-json/jwt-auth/v1/token",
+				Request.Method.POST
+		);
+		customRequest.setParamAndValue("username", "admin");
+		customRequest.setParamAndValue("password", "admin");
+		customRequest.executeRequest();
+		basicTokenCounter++;
 	}
-
+	
 	public void onHome(View v) {
-		startActivity(new Intent(this, Home.class));
+		startActivity(new Intent(this, Categories.class));
 	}
-
-	public void onDraw(View v) {
-		startActivity(new Intent(this, Main2Activity.class));
+	
+	private void oneTimeCode() {
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+		if (!sharedPreferences.getBoolean("firstTime", false)) {
+			//----\  /---
+			// ----\/---- run your one time code here
+			Log.v("MODEL:", Build.MODEL);
+			if ((Build.MODEL).equals("Android SDK built for x86")) {
+				All.setLOCALHOST(true);
+			} else {
+				All.setLOCALHOST(false);
+			}
+			// mark first time has run.
+			SharedPreferences.Editor editor = sharedPreferences.edit();
+			editor.putBoolean("firstTime", true);
+			editor.apply(); //editor.commit();
+		}
 	}
 }
