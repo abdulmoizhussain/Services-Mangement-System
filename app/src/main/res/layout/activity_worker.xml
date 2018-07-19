@@ -23,7 +23,7 @@
 			android:layout_weight=".7"
 			app:layout_constraintStart_toStartOf="parent"
 			app:layout_constraintTop_toTopOf="parent"
-			app:srcCompat="@drawable/main_logo" />
+			app:srcCompat="@drawable/vendor_app" />
 
 
 		<TextView
@@ -70,7 +70,6 @@
 			app:layout_constraintEnd_toEndOf="parent"
 			app:layout_constraintStart_toStartOf="parent"
 			app:layout_constraintTop_toBottomOf="@+id/worker_fee" />
-
 
 	</android.support.constraint.ConstraintLayout>
 

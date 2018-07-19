@@ -1,5 +1,6 @@
 package com.example.abdul.servicesmanagementsystem;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import org.json.JSONObject;
 
 public class Login extends BaseActivity {
 	private EditText user, pass;
+	private ProgressDialog progressDialog;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +28,8 @@ public class Login extends BaseActivity {
 		
 		user = findViewById(R.id.username);
 		pass = findViewById(R.id.password);
+		progressDialog = new ProgressDialog(Login.this);
+		progressDialog.setMessage(All.LOADING_MSG);
 	}
 	
 	public void onSubmit(View v) {
@@ -46,6 +50,7 @@ public class Login extends BaseActivity {
 					public void notifySuccess(String response) {
 
 						if (response.length() < 10) {
+							progressDialog.dismiss();
 							Toast.makeText(Login.this, response, Toast.LENGTH_SHORT).show();
 							return;
 						}
@@ -63,7 +68,7 @@ public class Login extends BaseActivity {
 						CustomRequest customRequest1 = new CustomRequest(new IResult() {
 							@Override
 							public void notifySuccess(String response) {
-								
+								progressDialog.dismiss();
 								if (response.length() < 6 ) {
 									Toast.makeText(Login.this, "User not recognized.", Toast.LENGTH_SHORT).show();
 									return;
@@ -85,6 +90,7 @@ public class Login extends BaseActivity {
 							
 							@Override
 							public void notifyError(VolleyError error) {
+								progressDialog.dismiss();
 								All.handleVolleyError(Login.this, error);
 							}
 						},
@@ -99,6 +105,7 @@ public class Login extends BaseActivity {
 					
 					@Override
 					public void notifyError(VolleyError error) {
+						progressDialog.dismiss();
 						All.handleVolleyError(Login.this, error);
 					}
 				},
@@ -109,6 +116,7 @@ public class Login extends BaseActivity {
 		customRequest.setParamAndValue("username", username);
 		customRequest.setParamAndValue("password", password);
 		
+		progressDialog.show();
 		customRequest.executeRequest();
 	}
 	

@@ -31,7 +31,7 @@ public class MainActivity extends BaseActivity {
 		basicTokenCounter = 0;
 		getAndSaveBasicTOKEN(); // to check internet connectivity and set basic working token.
 	}
-
+	
 	
 	private void getAndSaveBasicTOKEN() {
 		CustomRequest customRequest = new CustomRequest(new IResult() {
@@ -58,7 +58,7 @@ public class MainActivity extends BaseActivity {
 			}
 		},
 				MainActivity.this,
-				"http://" + All.LOCALHOST+"/fixmyhome/wp-json/jwt-auth/v1/token",
+				"http://" + All.LOCALHOST + "/fixmyhome/wp-json/jwt-auth/v1/token",
 				Request.Method.POST
 		);
 		customRequest.setParamAndValue("username", "admin");
@@ -72,20 +72,12 @@ public class MainActivity extends BaseActivity {
 	}
 	
 	private void oneTimeCode() {
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-		if (!sharedPreferences.getBoolean("firstTime", false)) {
-			//----\  /---
-			// ----\/---- run your one time code here
-			Log.v("MODEL:", Build.MODEL);
-			if ((Build.MODEL).equals("Android SDK built for x86")) {
-				All.setLOCALHOST(true);
-			} else {
-				All.setLOCALHOST(false);
-			}
-			// mark first time has run.
-			SharedPreferences.Editor editor = sharedPreferences.edit();
-			editor.putBoolean("firstTime", true);
-			editor.apply(); //editor.commit();
+		Log.v("MODEL:", Build.MODEL);
+		if ((Build.MODEL).equals("Android SDK built for x86")) {
+			All.setLOCALHOST(true);
+		} else {
+			All.setLOCALHOST(false);
 		}
 	}
 }
+
